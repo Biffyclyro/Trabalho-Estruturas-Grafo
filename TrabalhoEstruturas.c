@@ -41,7 +41,7 @@ void exlcuiRota(Cidade *c){
         ant=k;
         k=k->prox;
     }
-    if(strcmp(k->city->nom, nome2)!=0){
+    if(strcmp(k->city->nome, nome2)!=0){
         printf("Cidade destino errada, tente novamente!\n");
         return;
     }
@@ -60,7 +60,7 @@ void exlcuiRota(Cidade *c){
 }
 
 Cidade *excluiCidade(Cidade *c){
-    Cidaade *p, *ant=NULL;
+    Cidade *p, *ant=NULL;
     Adj *k;
     char nome[30];
     printf("Entre com o nome da cidade:\n");
@@ -166,22 +166,67 @@ void exibirCidade(Cidade *c){
     Adj *k;
     char nome[30];
     printf("Entre com o nome da cidade:\n");
+    
+    //fflush(stdin);
     gets(nome);
     for(p=c; p->prox!=NULL && strcmp(p->nome, nome)!=0; p=p->prox);
     if(strcmp(p->nome, nome)!=0){
         printf("Cidade nao encontrada!\n");
         return;
     }
-    puts(p->nome);
+    //puts(p->nome);
     for(k=p->rotas; k->prox!=NULL; k=k->prox){
+        puts(p->nome);
         puts(k->city->nome);
-        printf("Distancia %d\n");
+        printf("Distancia %dKm\n",k->peso);
         printf("\n");
     }
 }
 
+Cidade *varreGrafo(Cidade *o, Cidade *d){
+    Adj *k;
+    Cidade *p;
+    if(o->rotas ==NULL){
+        printf("rotas vazias\n");
+        return;
+    }
+    for(k=o->rotas; k->prox!=NULL && k->city != d; k=k->prox);
+    puts(k->city->nome);
+    if(k->city != d){
+        p=varreGrafo(k->city, d);
+        puts(p->nome);
+        return k->city;
+    }else return o;
+}
+
+void rotaEntreCidades(Cidade *c){
+    Cidade *p, *pp, *r;
+    
+    char nome[30], nome2[30];
+    printf("Entre com o nome da cidade origem:\n");
+    gets(nome);
+    printf("Entre com o nome da cidade destino:\n");
+    gets(nome2);
+    
+    for(p=c; p->prox!=NULL && strcmp(p->nome, nome)!=0;p=p->prox);
+    if(strcmp(p->nome, nome)!=0){
+        printf("Cidade origem nao encontrada!\n");
+        return;
+    }
+
+    for(pp=c; pp->prox!=NULL && strcmp(pp->nome, nome2)!=0;pp=pp->prox);
+    if(strcmp(pp->nome, nome2)!=0){
+        printf("Cidade origem nao encontrada!\n");
+        return;
+    }
+    r=varreGrafo(p,pp);
+    //puts(r->nome);
+
+}
+
 
 main(){
+    __fpurge(stdin);
     int resp=0, x, y;
     char nome[30],nome2[30];
     Cidade *c=NULL;
@@ -200,10 +245,12 @@ main(){
         printf("8.Consultar rota entre cidade.\n");
         printf("9.Sair.\n");
         scanf("%d", &x);
+       // fflush(stdin);
+        __fpurge(stdin);
 
         switch (x){
             case 1:{
-                prinft("Entre com o nome da cidade:\n");
+                printf("Entre com o nome da cidade:\n");
                 gets(nome);
                 c=addCidade(c,nome);
                 break;
@@ -238,10 +285,12 @@ main(){
             }
 
             case 6:{
+                exibirCidade(c);
                 break;
             }
 
             case 7:{
+                rotaEntreCidades(c);
                 break;
             }
 
@@ -250,8 +299,9 @@ main(){
             }
 
             case 9:{
-                printf("Saindo...");
+                printf("Saindo...\n");
                 resp++;
+                break;
             }
 
             default:{
