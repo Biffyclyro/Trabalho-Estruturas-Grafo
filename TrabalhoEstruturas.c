@@ -59,6 +59,127 @@ void exlcuiRota(Cidade *c){
     }
 }
 
+Cidade *excluiCidade(Cidade *c){
+    Cidaade *p, *ant=NULL;
+    Adj *k;
+    char nome[30];
+    printf("Entre com o nome da cidade:\n");
+    gets(nome);
+    for(p=c; c->prox!=NULL && strcmp(p->nome, nome)!=0;){
+        ant=p;
+        p=p->prox;
+    }
+    if(strcmp(p->nome, nome)!=0){
+        printf("Cidade nao encontrada!\n");
+        return c;
+    }
+
+    if(p==c){
+        if(p->prox==NULL){
+            for(k=p->rotas; k->prox!=NULL; k=k->prox)free(k);
+            free(p);
+            return NULL;
+        }else{
+            for(k=p->rotas; k->prox!=NULL; k=k->prox)free(k);
+            ant=p->prox;
+            free(p);
+            return ant;
+        }
+        
+    }
+    if(p->prox==NULL){
+        ant->prox=NULL;
+        for(k=p->rotas; k->prox!=NULL; k=k->prox)free(k);
+        free(p);
+        return c;
+
+    }else{
+        for(k=p->rotas; k->prox!=NULL; k=k->prox)free(k);
+        ant->prox=p->prox;
+        free(p);
+        return c;
+    }
+
+}
+
+void editarCidade(Cidade *c){
+    Cidade *p;
+    Adj *k;
+    char nome[30];
+    int x, resp=0, y;
+
+    printf("Entre com o nome da cidade:\n");
+    gets(nome);
+    for(p=c; p->prox!=NULL && strcmp(p->nome, nome) != 0; p=p->prox);
+    if(strcmp(p->nome, nome) != 0){
+        printf("Cidade nao encontrada!\n");
+        return;
+    }
+
+    while(resp==0){
+        printf("Entre com a opcao que quer alterar:\n");
+        printf("1.Nome da cidade.\n");
+        printf("2.Distancia entre cidades.\n");
+        printf("3.Retornar menu principal.\n");
+        scanf("%d", &x);
+
+        switch (x)
+        {
+            case 1:{
+                printf("Entre com o novo nome:\n");
+                gets(nome);
+                strcpy(p->nome, nome);
+                break;
+            }
+            case 2:{
+                printf("Entre com a cidade destino e a nova distancia:\n");
+                gets(nome);
+                scanf("%d", &y);
+                for(k=p->rotas; k->prox!=NULL && strcmp(k->city->nome, nome)!=0; k=k->prox);
+                if(strcmp(k->city->nome, nome)!=0){
+                    printf("Cidade destino nao encontrada!\n");
+                    return;
+                }
+                k->peso=y;
+                break;
+            }
+
+            case 3:{
+                printf("Voltado...\n");
+                resp++;
+                break;
+            }
+
+            default:{
+                printf("Opcao invalida!\n");
+                break;
+            }
+        
+        }
+    }
+
+
+}
+
+void exibirCidade(Cidade *c){
+    Cidade *p;
+    Adj *k;
+    char nome[30];
+    printf("Entre com o nome da cidade:\n");
+    gets(nome);
+    for(p=c; p->prox!=NULL && strcmp(p->nome, nome)!=0; p=p->prox);
+    if(strcmp(p->nome, nome)!=0){
+        printf("Cidade nao encontrada!\n");
+        return;
+    }
+    puts(p->nome);
+    for(k=p->rotas; k->prox!=NULL; k=k->prox){
+        puts(k->city->nome);
+        printf("Distancia %d\n");
+        printf("\n");
+    }
+}
+
 
 main(){
     int resp=0, x, y;
@@ -102,6 +223,7 @@ main(){
             }
 
             case 3:{
+                c=excluiCidade(c);
                 break;
             }
 
@@ -111,6 +233,7 @@ main(){
             }
 
             case 5:{
+                editarCidade(c);
                 break;
             }
 
