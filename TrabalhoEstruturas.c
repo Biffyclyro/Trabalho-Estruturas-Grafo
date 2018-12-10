@@ -166,21 +166,26 @@ void exibirCidade(Cidade *c){
     Adj *k;
     char nome[30];
     printf("Entre com o nome da cidade:\n");
+    //__fpurge(stdin);
     
     //fflush(stdin);
     gets(nome);
     for(p=c; p->prox!=NULL && strcmp(p->nome, nome)!=0; p=p->prox);
+  //  puts(p->nome);
     if(strcmp(p->nome, nome)!=0){
         printf("Cidade nao encontrada!\n");
         return;
     }
-    //puts(p->nome);
-    for(k=p->rotas; k->prox!=NULL; k=k->prox){
-        puts(p->nome);
+    for(k=p->rotas; k!=NULL; k=k->prox){
+    
+        printf("\n");
         puts(k->city->nome);
         printf("Distancia %dKm\n",k->peso);
-        printf("\n");
+        
     }
+    printf("\n");
+     //   puts(c->prox->prox->rotas->prox->city->nome);
+
 }
 
 Cidade *varreGrafo(Cidade *o, Cidade *d){
@@ -188,26 +193,37 @@ Cidade *varreGrafo(Cidade *o, Cidade *d){
     Cidade *p;
     if(o->rotas ==NULL){
         printf("rotas vazias\n");
-        return;
+        return o;
     }
+    
     for(k=o->rotas; k->prox!=NULL && k->city != d; k=k->prox);
-    puts(k->city->nome);
-    if(k->city != d){
-        p=varreGrafo(k->city, d);
-        puts(p->nome);
-        return k->city;
-    }else return o;
+       // puts(k->city->nome);
+        if(k->city != d){
+          //  puts(k->city->nome);
+            puts(k->city->nome);
+            printf("|\n");
+            printf("v\n");
+            p=varreGrafo(k->city, d);            
+            return p;
+        }else{
+             return d;
+        }     
+        
+    
 }
 
 void rotaEntreCidades(Cidade *c){
     Cidade *p, *pp, *r;
+    Adj *i;
     
     char nome[30], nome2[30];
     printf("Entre com o nome da cidade origem:\n");
     gets(nome);
     printf("Entre com o nome da cidade destino:\n");
     gets(nome2);
-    
+    __fpurge(stdin);
+
+    printf("\n");
     for(p=c; p->prox!=NULL && strcmp(p->nome, nome)!=0;p=p->prox);
     if(strcmp(p->nome, nome)!=0){
         printf("Cidade origem nao encontrada!\n");
@@ -216,11 +232,16 @@ void rotaEntreCidades(Cidade *c){
 
     for(pp=c; pp->prox!=NULL && strcmp(pp->nome, nome2)!=0;pp=pp->prox);
     if(strcmp(pp->nome, nome2)!=0){
-        printf("Cidade origem nao encontrada!\n");
+        printf("Cidade Destino nao encontrada!\n");
         return;
     }
-    r=varreGrafo(p,pp);
-    //puts(r->nome);
+    for(i=p->rotas; i!=NULL; i=i->prox){
+        r=varreGrafo(i->city,pp);
+        puts(r->nome);
+        printf("\n");
+        printf("\n");
+    }
+    
 
 }
 
@@ -240,9 +261,9 @@ main(){
         printf("3.Remover cidade.\n");
         printf("4.Remover caminho.\n");
         printf("5.Editar cidade.\n");
-        printf("6.Editar rota.\n");
-        printf("7.Consultar cidade.\n");
-        printf("8.Consultar rota entre cidade.\n");
+        
+        printf("6.Consultar cidade.\n");
+        printf("7.Consultar rota entre cidade.\n");
         printf("9.Sair.\n");
         scanf("%d", &x);
        // fflush(stdin);
@@ -295,6 +316,8 @@ main(){
             }
 
             case 8:{
+                Cidade *p;
+                for(p=c; p!=NULL; p=p->prox)puts(p->rotas->city->nome);
                 break;
             }
 
@@ -323,7 +346,7 @@ void addRotas(char n1[], char n2[], int peso, Cidade *lista){
     //puts(n1);
     for(c=lista; c->prox!=NULL && strcmp(c->nome, n1)!=0; c=c->prox);
     if(strcmp(c->nome, n1)!=0){
-      
+      printf("porraaa");
         return;
     }   
 
@@ -387,6 +410,7 @@ Cidade *addTodas(){
     char nome[30], nome2[30];
     Cidade *c=NULL;
     strcpy(nome,"SM");
+    __fpurge(stdin);
     c=addCidade(c,nome);    
     strcpy(nome,"POA");
     c=addCidade(c,nome);    
@@ -411,10 +435,12 @@ printf("\n");
     strcpy(nome, "Passo Fundo");
     strcpy(nome2, "POA");
     addRotas(nome, nome2, 289, c);
+    __fpurge(stdin);
 
     strcpy(nome, "POA");
     strcpy(nome2, "Pelotas");
     addRotas(nome, nome2, 261, c);
+    __fpurge(stdin);
 
     strcpy(nome, "Pelotas");
     strcpy(nome2, "Bage");
