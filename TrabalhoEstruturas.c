@@ -197,45 +197,6 @@ void exibirCidade(Cidade *c){
 }
 
 
-
-
-
-
-Cidade *varreGrafo2(Adj *r, Cidade *d){
-    Adj *k;
-    Cidade *p;
-    
-    if(r ==NULL){
-        printf("rotas vazias\n");
-        return r->city;
-    }
-    __fpurge(stdin);
-    
-    
-        for(k=r; k->prox!=NULL && k->city != d; k=k->prox);
-        // puts(k->city->nome);
-            if(k->city != d){
-            //  puts(k->city->nome);
-                puts(k->city->nome);
-                printf("|\n");
-                printf("v\n");
-              //  dist+=k->peso;
-                p=varreGrafo2(k->city, d);            
-                return p;
-            }else{
-                return d;
-            }
-             
-        
-    
-}
-
-
-
-
-
-
-
 Cidade *varreGrafo(Cidade *o, Cidade *d){
     Adj *k;
     Cidade *p;
@@ -246,8 +207,9 @@ Cidade *varreGrafo(Cidade *o, Cidade *d){
     }
     __fpurge(stdin);
     
-    
+//        dist=0;
         for(k=o->rotas; k->prox!=NULL && k->city != d; k=k->prox);
+            
         // puts(k->city->nome);
             if(k->city != d){
             //  puts(k->city->nome);
@@ -258,6 +220,7 @@ Cidade *varreGrafo(Cidade *o, Cidade *d){
                 p=varreGrafo(k->city, d);            
                 return p;
             }else{
+                
                 return d;
             }
              
@@ -288,17 +251,29 @@ void rotaEntreCidades(Cidade *c){
         printf("Cidade Destino nao encontrada!\n");
         return;
     }
+
     
     
-    for(i=p->rotas; i!=NULL; i=i->prox){
+    
+    for(i=p->rotas; i!=NULL && i->city !=pp; i=i->prox){
+          
+        
         dist+=i->peso;
         puts(i->city->nome);
         printf("|\n");
         printf("v\n");
+
+        if(i->city==pp){
+            puts(pp->nome);
+            dist=i->peso;
+        } 
         r=varreGrafo(i->city,pp);
         puts(r->nome);
         printf("%d Km\n", dist);
-        if(dist<comp)cont++;
+        if(dist<comp){
+            cont++;
+            comp=dist;
+        } 
         dist=0;
         printf("\n");
         printf("\n");
@@ -316,7 +291,7 @@ void rotaEntreCidades(Cidade *c){
         r=varreGrafo(i->city,pp);
         puts(r->nome);
         printf("%d Km\n", dist);
-        if(dist<comp)cont++;
+        cont=0;
         dist=0;
         printf("\n");
         printf("\n");
@@ -390,7 +365,10 @@ main(){
             }
 
             case 7:{
+                __fpurge(stdin);
                 rotaEntreCidades(c);
+                comp=5000;
+                __fpurge(stdin);
                 break;
             }
 
