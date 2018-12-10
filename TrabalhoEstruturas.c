@@ -17,6 +17,7 @@ struct adjacente{
 
 typedef struct cidade Cidade;
 typedef struct adjacente Adj;
+int dist=0;
 
 
 void addRotas(char n1[], char n2[], int peso, Cidade *lista);
@@ -33,6 +34,7 @@ void exlcuiRota(Cidade *c){
     printf("Ate:\n");
     gets(nome2);
     for(p=c; p->prox!=NULL && strcmp(p->nome, nome)!=0; p=p->prox);
+    
     if(strcmp(p->nome, nome)!=0){
         printf("Nome da cidade de partida errada, tente novamente!\n");
         return;
@@ -41,14 +43,18 @@ void exlcuiRota(Cidade *c){
         ant=k;
         k=k->prox;
     }
+    if(p->rotas==k){
+        p->rotas=NULL;
+        free(k);
+        return;
+    }
+
+
     if(strcmp(k->city->nome, nome2)!=0){
         printf("Cidade destino errada, tente novamente!\n");
         return;
     }
-    if(p->rotas==k){
-        p->rotas=NULL;
-        free(k);
-    }
+    
 
     if(k->prox!=NULL){
         ant->prox=k->prox;
@@ -122,7 +128,7 @@ void editarCidade(Cidade *c){
         printf("2.Distancia entre cidades.\n");
         printf("3.Retornar menu principal.\n");
         scanf("%d", &x);
-
+        __fpurge(stdin);
         switch (x)
         {
             case 1:{
@@ -188,26 +194,71 @@ void exibirCidade(Cidade *c){
 
 }
 
+
+
+
+
+
+Cidade *varreGrafo2(Adj *r, Cidade *d){
+    Adj *k;
+    Cidade *p;
+    
+    if(r ==NULL){
+        printf("rotas vazias\n");
+        return r->city;
+    }
+    __fpurge(stdin);
+    
+    
+        for(k=r; k->prox!=NULL && k->city != d; k=k->prox);
+        // puts(k->city->nome);
+            if(k->city != d){
+            //  puts(k->city->nome);
+                puts(k->city->nome);
+                printf("|\n");
+                printf("v\n");
+              //  dist+=k->peso;
+                p=varreGrafo2(k->city, d);            
+                return p;
+            }else{
+                return d;
+            }
+             
+        
+    
+}
+
+
+
+
+
+
+
 Cidade *varreGrafo(Cidade *o, Cidade *d){
     Adj *k;
     Cidade *p;
+    
     if(o->rotas ==NULL){
         printf("rotas vazias\n");
         return o;
     }
+    __fpurge(stdin);
     
-    for(k=o->rotas; k->prox!=NULL && k->city != d; k=k->prox);
-       // puts(k->city->nome);
-        if(k->city != d){
-          //  puts(k->city->nome);
-            puts(k->city->nome);
-            printf("|\n");
-            printf("v\n");
-            p=varreGrafo(k->city, d);            
-            return p;
-        }else{
-             return d;
-        }     
+    
+        for(k=o->rotas; k->prox!=NULL && k->city != d; k=k->prox);
+        // puts(k->city->nome);
+            if(k->city != d){
+            //  puts(k->city->nome);
+                puts(k->city->nome);
+                printf("|\n");
+                printf("v\n");
+                dist+=k->peso;
+                p=varreGrafo(k->city, d);            
+                return p;
+            }else{
+                return d;
+            }
+             
         
     
 }
@@ -235,11 +286,20 @@ void rotaEntreCidades(Cidade *c){
         printf("Cidade Destino nao encontrada!\n");
         return;
     }
+
+    
     for(i=p->rotas; i!=NULL; i=i->prox){
+        dist+=i->peso;
+        puts(i->city->nome);
+        printf("|\n");
+        printf("v\n");
         r=varreGrafo(i->city,pp);
         puts(r->nome);
+        printf("%d Km\n", dist);
+        dist=0;
         printf("\n");
         printf("\n");
+        
     }
     
 
@@ -253,7 +313,7 @@ main(){
     Cidade *c=NULL;
     c=addTodas();
 
-    puts(c->rotas->prox->city->nome);
+    //puts(c->rotas->prox->city->nome);
 
     while (resp!=1){
         printf("1.Cadastrar cidade.\n");
@@ -342,18 +402,17 @@ void addRotas(char n1[], char n2[], int peso, Cidade *lista){
     Adj *p, *nova;
     Cidade *k, *c;
     int cont=0;
-   // printf("\n");
-    //puts(n1);
+  
     for(c=lista; c->prox!=NULL && strcmp(c->nome, n1)!=0; c=c->prox);
     if(strcmp(c->nome, n1)!=0){
-      printf("porraaa");
+      printf("Nao existe a cidade\n");
         return;
     }   
 
     if(c->rotas==NULL){
         for(k=lista; k->prox != NULL && strcmp(k->nome, n2)!=0 ; k=k->prox);
         if(strcmp(k->nome, n2)!=0){
-            printf("nao existe a cidade ", cont);
+            printf("nao existe a cidade \n");
             return;
         }
         nova=(Adj*) malloc(sizeof(Adj));
@@ -366,7 +425,7 @@ void addRotas(char n1[], char n2[], int peso, Cidade *lista){
         for(p=c->rotas; p->prox!=NULL; p=p->prox);
         for(k=lista; k->prox != NULL && strcmp(k->nome, n2)!=0 ; k=k->prox);
         if(strcmp(k->nome, n2)!=0){
-            printf("nao existe a cidade%d\n", cont);
+            printf("nao existe a cidade\n");
             return;
         }
         nova=(Adj*) malloc(sizeof(Adj));
@@ -392,13 +451,17 @@ Cidade *addCidade(Cidade *c, char n[]){
        
     }else{
         
-        for(p=c; p->prox!=NULL; p=p->prox);
+        for(p=c; p->prox!=NULL && strcmp(p->nome, n)!=0; p=p->prox);
+        if(strcmp(p->nome, n)==0){
+            printf("Cidade ja existe!\n");
+            return c;
+        }
         nova=(Cidade*) malloc(sizeof(Cidade));        
         strcpy(nova->nome, n);
         nova->prox=NULL;
         nova->rotas=NULL;
         p->prox=nova;
-        puts(p->nome);
+      //  puts(p->nome);
         return c; 
 
     }
@@ -430,7 +493,7 @@ Cidade *addTodas(){
     c=addCidade(c,nome);
     strcpy(nome,"Cruz Alta");
     c=addCidade(c,nome);
-printf("\n");
+    printf("\n");
 
     strcpy(nome, "Passo Fundo");
     strcpy(nome2, "POA");
