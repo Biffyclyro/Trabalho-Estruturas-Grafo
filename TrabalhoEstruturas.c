@@ -18,6 +18,8 @@ struct adjacente{
 typedef struct cidade Cidade;
 typedef struct adjacente Adj;
 int dist=0;
+int comp=5000;
+int cont=0;
 
 
 void addRotas(char n1[], char n2[], int peso, Cidade *lista);
@@ -286,7 +288,7 @@ void rotaEntreCidades(Cidade *c){
         printf("Cidade Destino nao encontrada!\n");
         return;
     }
-
+    
     
     for(i=p->rotas; i!=NULL; i=i->prox){
         dist+=i->peso;
@@ -296,11 +298,28 @@ void rotaEntreCidades(Cidade *c){
         r=varreGrafo(i->city,pp);
         puts(r->nome);
         printf("%d Km\n", dist);
+        if(dist<comp)cont++;
         dist=0;
         printf("\n");
         printf("\n");
         
     }
+    int j;
+    i=p->rotas;
+    for(j=1; j<cont; j++)i=i->prox;
+
+        printf("Melhor rota!\n\n");
+        dist+=i->peso;
+        puts(i->city->nome);
+        printf("|\n");
+        printf("v\n");
+        r=varreGrafo(i->city,pp);
+        puts(r->nome);
+        printf("%d Km\n", dist);
+        if(dist<comp)cont++;
+        dist=0;
+        printf("\n");
+        printf("\n");
     
 
 }
@@ -401,7 +420,7 @@ main(){
 void addRotas(char n1[], char n2[], int peso, Cidade *lista){
     Adj *p, *nova;
     Cidade *k, *c;
-    int cont=0;
+ //   int cont=0;
   
     for(c=lista; c->prox!=NULL && strcmp(c->nome, n1)!=0; c=c->prox);
     if(strcmp(c->nome, n1)!=0){
